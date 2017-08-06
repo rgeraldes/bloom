@@ -1,4 +1,4 @@
-package bloom
+package standard
 
 import (
 	"fmt"

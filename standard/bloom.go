@@ -1,5 +1,5 @@
-// Package bloom - implements a bloom filter
-package bloom
+// Package standard - implements a bloom filter
+package standard
 
 import (
 	"math"
@@ -95,3 +95,5 @@ func (f *Filter) Clear() {
 		f.bits[i] = 0
 	}
 }
+
+// Union - union of bloom filters
