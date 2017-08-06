@@ -36,14 +36,13 @@ func New(n int, p float64) *Filter {
 		panic("bloom.New: incorrect number of elements")
 	}
 
-	// Optimal number of bits, m, m = -(n log(p) / pow(log(2), 2))
+	// Optimal number of bits, m = -(n log(p) / pow(log(2), 2))
 	// pow(log(2),2)
 	const lnsq = 0.480453013918201424667102526326664971730552951594545586866864133623665382259834472199948263443926990932715597661358897481255128413358268503177555294880844290839184664798896404335252423673643658092881230886029639112807153031
 	nfloat := float64(n)
 	m := -math.Ceil(nfloat * math.Log(p) / lnsq)
 	nbits := ((uint64(m) + mod) >> div) * word
 	nhashes := uint64(-int(math.Ceil(math.Log(p) / math.Ln2)))
-
 	return &Filter{
 		bits:    make([]uint64, nbits>>div),
 		nbits:   nbits,
@@ -60,7 +59,7 @@ func (f *Filter) AddBytes(key []byte) {
 	a, b := siphash.Hash128(k0, k1, key)
 	for h := uint64(0); h <= f.nhashes; h++ {
 		i := (a + h*b) % f.nbits
-		mask := uint64(1) << (i % mod)
+		mask := uint64(1) << (i & mod)
 		// if bit is not set in a specific word (i>>div)
 		if f.bits[i>>div]&mask == 0 {
 			f.bits[i>>div] |= mask
@@ -77,7 +76,7 @@ func (f *Filter) HasBytes(key []byte) bool {
 	a, b := siphash.Hash128(k0, k1, key)
 	for h := uint64(0); h <= f.nhashes; h++ {
 		i := (a + h*b) % f.nbits
-		mask := uint64(1) << (i & div)
+		mask := uint64(1) << (i & mod)
 		if f.bits[i>>div]&mask == 0 {
 			return false
 		}
