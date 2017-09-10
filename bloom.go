@@ -1,5 +1,5 @@
 // Package standard - implements a bloom filter
-package standard
+package bloom
 
 import (
 	"math"
